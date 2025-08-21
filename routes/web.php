@@ -187,8 +187,14 @@ Route::middleware(['web'])->group(function () {
     // Move admin-only endpoints under /admin/*
     Route::prefix('admin')->middleware(['auth','role:admin'])->group(function(){
         // School profile
-        Route::get('/school/profile', [SchoolProfileController::class, 'show']);
-        Route::post('/school/profile', [SchoolProfileController::class, 'upsert']);
+        Route::get('/school/profile', [SchoolProfileController::class, 'show'])->name('admin.school.profile');
+        Route::post('/school/profile', [SchoolProfileController::class, 'upsert'])->name('admin.school.profile.save');
+
+        // Holidays management
+        Route::get('/school/holidays', [\App\Http\Controllers\HolidayController::class, 'index'])->name('admin.school.holidays.index');
+        Route::post('/school/holidays', [\App\Http\Controllers\HolidayController::class, 'store'])->name('admin.school.holidays.store');
+        Route::delete('/school/holidays/{holiday}', [\App\Http\Controllers\HolidayController::class, 'destroy'])->name('admin.school.holidays.destroy');
+        Route::post('/school/holidays/sync-govt', [\App\Http\Controllers\HolidayController::class, 'syncGovt'])->name('admin.school.holidays.sync');
 
         // Users management
         Route::get('/users', [UserManagementController::class, 'index']);

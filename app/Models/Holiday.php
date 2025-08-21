@@ -5,22 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SchoolProfile extends Model
+class Holiday extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'date',      // Y-m-d
         'name',
-        'logo_path',
-        'address',
-        'phone',
-        'academic_year',
-        'country',
-        'timezone',
-        'holidays',
+        'type',      // govt | school
+        'country',   // ISO country name or code
+        'year',
     ];
 
     protected $casts = [
-        'holidays' => 'array',
+        'date' => 'date:Y-m-d',
+        'year' => 'integer',
     ];
 }

@@ -12,12 +12,16 @@ class SchoolProfile extends Model
     protected $fillable = [
         'name',
         'logo_path',
+        'academic_year',
+        'holidays',
+        // added fields
         'address',
         'phone',
-        'academic_year',
-        'country',
-        'timezone',
-        'holidays',
+        'email',
+        'website',
+        'about',
+        'established_year',
+        'banner_image_path',
     ];
 
     protected $casts = [

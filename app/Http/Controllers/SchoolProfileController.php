@@ -10,7 +10,8 @@ class SchoolProfileController extends Controller
     public function show()
     {
         $profile = SchoolProfile::first();
-        return response()->json($profile);
+        // Render Blade view for admin
+        return view('admin.school.profile', compact('profile'));
     }
 
     public function upsert(Request $request)
@@ -18,8 +19,11 @@ class SchoolProfileController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'logo_path' => 'nullable|string|max:1024',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:50',
             'academic_year' => 'nullable|string|max:255',
-            'holidays' => 'nullable|array',
+            'country' => 'nullable|string|max:100',
+            'timezone' => 'nullable|string|max:100',
         ]);
 
         $profile = SchoolProfile::first();
@@ -29,6 +33,9 @@ class SchoolProfileController extends Controller
             $profile = SchoolProfile::create($data);
         }
 
-        return response()->json($profile, 201);
+        if ($request->wantsJson()) {
+            return response()->json($profile, 201);
+        }
+        return redirect()->route('admin.school.profile')->with('status', 'Profile saved');
     }
 }

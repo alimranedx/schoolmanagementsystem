@@ -70,14 +70,14 @@
                 </div>
             </li>
             <li class="nav-item">
-                <button class="nav-link d-flex align-items-center w-100 text-start" data-bs-toggle="collapse" data-bs-target="#menu-school" aria-expanded="false">
+                <button class="nav-link d-flex align-items-center w-100 text-start" data-bs-toggle="collapse" data-bs-target="#menu-school" aria-expanded="{{ request()->routeIs('admin.school.*') ? 'true' : 'false' }}">
                     <i class="bi bi-building me-2"></i> School Settings
                     <i class="bi bi-caret-down-fill ms-auto small"></i>
                 </button>
-                <div id="menu-school" class="collapse ps-2">
+                <div id="menu-school" class="collapse {{ request()->routeIs('admin.school.*') ? 'show' : '' }} ps-2">
                     <ul class="nav flex-column gap-1 mt-1">
-                        <li><a class="nav-link" href="#school-profile"><i class="bi bi-gear me-2"></i> Profile</a></li>
-                        <li><a class="nav-link disabled" href="#"><i class="bi bi-calendar3 me-2"></i> Holidays (coming soon)</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.school.profile') ? 'active' : '' }}" href="{{ route('admin.school.profile') }}"><i class="bi bi-gear me-2"></i> Profile</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.school.holidays.*') ? 'active' : '' }}" href="{{ route('admin.school.holidays.index') }}"><i class="bi bi-calendar3 me-2"></i> Holidays</a></li>
                     </ul>
                 </div>
             </li>
