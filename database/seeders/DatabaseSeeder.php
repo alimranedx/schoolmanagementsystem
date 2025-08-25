@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RoleSeeder::class);
+        $this->call(CountriesAsiaSeeder::class);
+        $this->call(BangladeshGeographySeeder::class);
 
         // Create an initial admin user (password: password)
         $admin = User::factory()->create([

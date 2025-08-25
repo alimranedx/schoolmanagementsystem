@@ -5,7 +5,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SchoolProfileController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CountryController;
+use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\UpazilaController;
+use App\Http\Controllers\DivisionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -190,6 +195,11 @@ Route::middleware(['web'])->group(function () {
         Route::get('/school/profile', [SchoolProfileController::class, 'show'])->name('admin.school.profile');
         Route::post('/school/profile', [SchoolProfileController::class, 'upsert'])->name('admin.school.profile.save');
 
+        // Location AJAX endpoints
+        Route::get('/locations/countries', [LocationController::class, 'countries'])->name('admin.locations.countries');
+        Route::get('/locations/districts', [LocationController::class, 'districts'])->name('admin.locations.districts');
+        Route::get('/locations/upazilas', [LocationController::class, 'upazilas'])->name('admin.locations.upazilas');
+
         // Holidays management
         Route::get('/school/holidays', [\App\Http\Controllers\HolidayController::class, 'index'])->name('admin.school.holidays.index');
         Route::post('/school/holidays', [\App\Http\Controllers\HolidayController::class, 'store'])->name('admin.school.holidays.store');
@@ -198,6 +208,8 @@ Route::middleware(['web'])->group(function () {
 
         // Users management
         Route::get('/users', [UserManagementController::class, 'index']);
+        Route::get('/users/pending-section', [UserManagementController::class, 'pending']);
+        Route::get('/users/users-section', [UserManagementController::class, 'all']);
         Route::post('/users/{user}/assign-role', [UserManagementController::class, 'assignRole']);
         Route::post('/users/{user}/revoke-role', [UserManagementController::class, 'revokeRole']);
         Route::post('/users/{user}/approve', [UserManagementController::class, 'approve']);
@@ -208,6 +220,45 @@ Route::middleware(['web'])->group(function () {
 
         // Notifications
         Route::post('/users/{user}/notify', [NotificationController::class, 'notifyUser']);
+        // Management Module (CRUD + bulk upload)
+        Route::prefix('management')->name('admin.management.')->group(function(){
+            // Countries
+            Route::get('/countries', [CountryController::class, 'index'])->name('countries.index');
+            Route::get('/countries/create', [CountryController::class, 'create'])->name('countries.create');
+            Route::post('/countries', [CountryController::class, 'store'])->name('countries.store');
+            Route::get('/countries/{country}/edit', [CountryController::class, 'edit'])->name('countries.edit');
+            Route::put('/countries/{country}', [CountryController::class, 'update'])->name('countries.update');
+            Route::delete('/countries/{country}', [CountryController::class, 'destroy'])->name('countries.destroy');
+            Route::post('/countries/upload', [CountryController::class, 'upload'])->name('countries.upload');
+
+            // Districts
+            Route::get('/districts', [DistrictController::class, 'index'])->name('districts.index');
+            Route::get('/districts/create', [DistrictController::class, 'create'])->name('districts.create');
+            Route::post('/districts', [DistrictController::class, 'store'])->name('districts.store');
+            Route::get('/districts/{district}/edit', [DistrictController::class, 'edit'])->name('districts.edit');
+            Route::put('/districts/{district}', [DistrictController::class, 'update'])->name('districts.update');
+            Route::delete('/districts/{district}', [DistrictController::class, 'destroy'])->name('districts.destroy');
+            Route::post('/districts/upload', [DistrictController::class, 'upload'])->name('districts.upload');
+
+            // Divisions
+            Route::get('/divisions', [DivisionController::class, 'index'])->name('divisions.index');
+            Route::get('/divisions/create', [DivisionController::class, 'create'])->name('divisions.create');
+            Route::post('/divisions', [DivisionController::class, 'store'])->name('divisions.store');
+            Route::get('/divisions/{division}/edit', [DivisionController::class, 'edit'])->name('divisions.edit');
+            Route::put('/divisions/{division}', [DivisionController::class, 'update'])->name('divisions.update');
+            Route::delete('/divisions/{division}', [DivisionController::class, 'destroy'])->name('divisions.destroy');
+            Route::post('/divisions/upload', [DivisionController::class, 'upload'])->name('divisions.upload');
+
+            // Upazilas
+            Route::get('/upazilas', [UpazilaController::class, 'index'])->name('upazilas.index');
+            Route::get('/upazilas/create', [UpazilaController::class, 'create'])->name('upazilas.create');
+            Route::post('/upazilas', [UpazilaController::class, 'store'])->name('upazilas.store');
+            Route::get('/upazilas/{upazila}/edit', [UpazilaController::class, 'edit'])->name('upazilas.edit');
+            Route::put('/upazilas/{upazila}', [UpazilaController::class, 'update'])->name('upazilas.update');
+            Route::delete('/upazilas/{upazila}', [UpazilaController::class, 'destroy'])->name('upazilas.destroy');
+            Route::post('/upazilas/upload', [UpazilaController::class, 'upload'])->name('upazilas.upload');
+        });
+
     });
 
     // Backwards-compatible redirects (optional, can be removed later)
@@ -215,6 +266,8 @@ Route::middleware(['web'])->group(function () {
     Route::post('/school/profile', fn() => redirect('/admin/school/profile')); // POST
 
     Route::get('/users', fn() => redirect('/admin/users'));
+    Route::get('/users/pending-section', fn() => redirect('/admin/users/pending-section'));
+    Route::get('/users/users-section', fn() => redirect('/admin/users/users-section'));
     Route::post('/users/{user}/assign-role', fn($user) => redirect("/admin/users/{$user}/assign-role"));
     Route::post('/users/{user}/revoke-role', fn($user) => redirect("/admin/users/{$user}/revoke-role"));
     Route::post('/users/{user}/approve', fn($user) => redirect("/admin/users/{$user}/approve"));

@@ -64,20 +64,8 @@
                 </button>
                 <div id="menu-users" class="collapse show ps-2">
                     <ul class="nav flex-column gap-1 mt-1">
-                        <li><a class="nav-link" href="#pending-section"><i class="bi bi-hourglass-split me-2"></i> Pending Approvals</a></li>
-                        <li><a class="nav-link" href="#users-section"><i class="bi bi-list-check me-2"></i> All Users</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link d-flex align-items-center w-100 text-start" data-bs-toggle="collapse" data-bs-target="#menu-school" aria-expanded="{{ request()->routeIs('admin.school.*') ? 'true' : 'false' }}">
-                    <i class="bi bi-building me-2"></i> School Settings
-                    <i class="bi bi-caret-down-fill ms-auto small"></i>
-                </button>
-                <div id="menu-school" class="collapse {{ request()->routeIs('admin.school.*') ? 'show' : '' }} ps-2">
-                    <ul class="nav flex-column gap-1 mt-1">
-                        <li><a class="nav-link {{ request()->routeIs('admin.school.profile') ? 'active' : '' }}" href="{{ route('admin.school.profile') }}"><i class="bi bi-gear me-2"></i> Profile</a></li>
-                        <li><a class="nav-link {{ request()->routeIs('admin.school.holidays.*') ? 'active' : '' }}" href="{{ route('admin.school.holidays.index') }}"><i class="bi bi-calendar3 me-2"></i> Holidays</a></li>
+                        <li><a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ url('/admin/users/pending-section') }}"><i class="bi bi-hourglass-split me-2"></i> Pending Approvals</a></li>
+                        <li><a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ url('/admin/users/users-section') }}"><i class="bi bi-list-check me-2"></i> All Users</a></li>
                     </ul>
                 </div>
             </li>
@@ -93,6 +81,33 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <button class="nav-link d-flex align-items-center w-100 text-start" data-bs-toggle="collapse" data-bs-target="#menu-mgmt" aria-expanded="{{ request()->routeIs('admin.management.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-gear me-2"></i> Management
+                    <i class="bi bi-caret-down-fill ms-auto small"></i>
+                </button>
+                <div id="menu-mgmt" class="collapse {{ request()->routeIs('admin.management.*') ? 'show' : '' }} ps-2">
+                    <ul class="nav flex-column gap-1 mt-1">
+                        <li><a class="nav-link {{ request()->routeIs('admin.management.countries.*') ? 'active' : '' }}" href="{{ route('admin.management.countries.index') }}"><i class="bi bi-flag me-2"></i>Country</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.management.divisions.*') ? 'active' : '' }}" href="{{ route('admin.management.divisions.index') }}"><i class="bi bi-diagram-3 me-2"></i>Division</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.management.districts.*') ? 'active' : '' }}" href="{{ route('admin.management.districts.index') }}"><i class="bi bi-geo me-2"></i>District</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.management.upazilas.*') ? 'active' : '' }}" href="{{ route('admin.management.upazilas.index') }}"><i class="bi bi-geo-alt me-2"></i>Upazila</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link d-flex align-items-center w-100 text-start" data-bs-toggle="collapse" data-bs-target="#menu-school" aria-expanded="{{ request()->routeIs('admin.school.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-building me-2"></i> School Settings
+                    <i class="bi bi-caret-down-fill ms-auto small"></i>
+                </button>
+                <div id="menu-school" class="collapse {{ request()->routeIs('admin.school.*') ? 'show' : '' }} ps-2">
+                    <ul class="nav flex-column gap-1 mt-1">
+                        <li><a class="nav-link {{ request()->routeIs('admin.school.profile') ? 'active' : '' }}" href="{{ route('admin.school.profile') }}"><i class="bi bi-gear me-2"></i> Profile</a></li>
+                        <li><a class="nav-link {{ request()->routeIs('admin.school.holidays.*') ? 'active' : '' }}" href="{{ route('admin.school.holidays.index') }}"><i class="bi bi-calendar3 me-2"></i> Holidays</a></li>
+                    </ul>
+                </div>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center" href="#notifications">
                     <i class="bi bi-bell me-2"></i> Notifications

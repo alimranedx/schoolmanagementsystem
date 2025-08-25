@@ -9,15 +9,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('school_profiles', function (Blueprint $table) {
-            // New fields (guard positions based on existing columns)
-            if (!Schema::hasColumn('school_profiles', 'established_at')) {
-                if (Schema::hasColumn('school_profiles', 'timezone')) {
-                    $table->dateTime('established_at')->nullable()->after('timezone');
+            if (!Schema::hasColumn('school_profiles', 'country')) {
+                if (Schema::hasColumn('school_profiles', 'academic_year')) {
+                    $table->string('country')->nullable()->after('academic_year');
                 } else {
-                    $table->dateTime('established_at')->nullable();
+                    $table->string('country')->nullable();
                 }
             }
-
             if (!Schema::hasColumn('school_profiles', 'district')) {
                 if (Schema::hasColumn('school_profiles', 'country')) {
                     $table->string('district')->nullable()->after('country');
@@ -25,7 +23,6 @@ return new class extends Migration
                     $table->string('district')->nullable();
                 }
             }
-
             if (!Schema::hasColumn('school_profiles', 'upazila')) {
                 if (Schema::hasColumn('school_profiles', 'district')) {
                     $table->string('upazila')->nullable()->after('district');
@@ -33,10 +30,12 @@ return new class extends Migration
                     $table->string('upazila')->nullable();
                 }
             }
-
-            // Remove academic_year per new requirements (guarded)
-            if (Schema::hasColumn('school_profiles', 'academic_year')) {
-                $table->dropColumn('academic_year');
+            if (!Schema::hasColumn('school_profiles', 'timezone')) {
+                if (Schema::hasColumn('school_profiles', 'upazila')) {
+                    $table->string('timezone')->nullable()->after('upazila');
+                } else {
+                    $table->string('timezone')->nullable();
+                }
             }
         });
     }
@@ -44,19 +43,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('school_profiles', function (Blueprint $table) {
-            // Recreate academic_year
-            if (!Schema::hasColumn('school_profiles', 'academic_year')) {
-                $table->string('academic_year')->nullable()->after('logo_path');
+            if (Schema::hasColumn('school_profiles', 'timezone')) {
+                $table->dropColumn('timezone');
             }
-            // Drop newly added fields
             if (Schema::hasColumn('school_profiles', 'upazila')) {
                 $table->dropColumn('upazila');
             }
             if (Schema::hasColumn('school_profiles', 'district')) {
                 $table->dropColumn('district');
             }
-            if (Schema::hasColumn('school_profiles', 'established_at')) {
-                $table->dropColumn('established_at');
+            if (Schema::hasColumn('school_profiles', 'country')) {
+                $table->dropColumn('country');
             }
         });
     }

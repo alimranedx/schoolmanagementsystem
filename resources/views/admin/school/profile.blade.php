@@ -29,15 +29,32 @@
                         <input type="text" name="academic_year" class="form-control" placeholder="e.g., 2025-2026" value="{{ old('academic_year', $profile->academic_year ?? '') }}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Country</label>
-                        <select name="country" class="form-select">
-                            <option value="Bangladesh" {{ (old('country', $profile->country ?? 'Bangladesh')=='Bangladesh')?'selected':'' }}>Bangladesh</option>
-                            <option value="">Other/Not set</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label">Timezone</label>
                         <input type="text" name="timezone" class="form-control" placeholder="Asia/Dhaka" value="{{ old('timezone', $profile->timezone ?? 'Asia/Dhaka') }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Country</label>
+                        <select id="country" name="country" class="form-select" required>
+                            <option value="">Select country</option>
+                            @foreach(($countries ?? []) as $c)
+                                <option value="{{ $c->name }}" data-id="{{ $c->id }}" {{ old('country', $profile->country ?? 'Bangladesh') == $c->name ? 'selected' : '' }}>{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('country')<div class="text-danger small">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">District</label>
+                        <select id="district" name="district" class="form-select">
+                            <option value="">Select district</option>
+                        </select>
+                        @error('district')<div class="text-danger small">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Upazila</label>
+                        <select id="upazila" name="upazila" class="form-select">
+                            <option value="">Select upazila</option>
+                        </select>
+                        @error('upazila')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Address</label>
@@ -60,4 +77,85 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(function() {
+        const routes = {
+            districts: "{{ route('admin.locations.districts') }}",
+            upazilas: "{{ route('admin.locations.upazilas') }}"
+        };
+
+        function getSelectedCountryId() {
+            return $('#country option:selected').data('id') || null;
+        }
+
+        function loadDistricts(countryId, selectedName) {
+            $('#district').html('<option value="">Loading...</option>');
+            $('#upazila').html('<option value="">Select upazila</option>');
+            if (!countryId) { $('#district').html('<option value="">Select district</option>'); return; }
+            $.get(routes.districts, { country_id: countryId })
+                .done(function(list){
+                    let options = '<option value="">Select district</option>';
+                    list.forEach(function(item){
+                        const sel = (selectedName && selectedName === item.name) ? ' selected' : '';
+                        options += `<option value="${item.name}" data-id="${item.id}"${sel}>${item.name}</option>`;
+                    });
+                    $('#district').html(options);
+                    if (selectedName) {
+                        $('#district').trigger('change');
+                    }
+                })
+                .fail(function(){ $('#district').html('<option value="">Select district</option>'); });
+        }
+
+        function loadUpazilas(districtId, selectedName) {
+            $('#upazila').html('<option value="">Loading...</option>');
+            if (!districtId) { $('#upazila').html('<option value="">Select upazila</option>'); return; }
+            $.get(routes.upazilas, { district_id: districtId })
+                .done(function(list){
+                    let options = '<option value="">Select upazila</option>';
+                    list.forEach(function(item){
+                        const sel = (selectedName && selectedName === item.name) ? ' selected' : '';
+                        options += `<option value="${item.name}" data-id="${item.id}"${sel}>${item.name}</option>`;
+                    });
+                    $('#upazila').html(options);
+                })
+                .fail(function(){ $('#upazila').html('<option value="">Select upazila</option>'); });
+        }
+
+        // Change handlers
+        $('#country').on('change', function(){
+            const cid = getSelectedCountryId();
+            loadDistricts(cid, null);
+        });
+        $('#district').on('change', function(){
+            const did = $('#district option:selected').data('id') || null;
+            loadUpazilas(did, null);
+        });
+
+        // Initial preselection using existing profile/old values
+        const preset = {
+            country: `{{ old('country', $profile->country ?? 'Bangladesh') }}`,
+            district: `{{ old('district', $profile->district ?? '') }}`,
+            upazila: `{{ old('upazila', $profile->upazila ?? '') }}`
+        };
+
+        // If country is already selected in the markup, load districts and upazilas accordingly
+        const initialCountryId = getSelectedCountryId();
+        if (initialCountryId) {
+            loadDistricts(initialCountryId, preset.district);
+            // Load upazilas after a short delay to ensure district loaded & selected
+            const checkDistrictLoaded = setInterval(function(){
+                const selectedDistrictId = $('#district option:selected').data('id');
+                if (selectedDistrictId || !preset.district) {
+                    clearInterval(checkDistrictLoaded);
+                    loadUpazilas(selectedDistrictId || null, preset.upazila);
+                }
+            }, 150);
+        }
+    });
+</script>
 @endsection

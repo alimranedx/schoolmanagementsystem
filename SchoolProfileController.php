@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SchoolProfile;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,28 +12,12 @@ class SchoolProfileController extends Controller
     public function show()
     {
         $profile = SchoolProfile::first();
-        // Return a default structure so UI has stable fields to bind to
-        if (!$profile) {
-            return response()->json([
-                'name' => '',
-                'logo_path' => null,
-                'banner_image_path' => null,
-                'academic_year' => '',
-                'address' => '',
-                'phone' => '',
-                'email' => '',
-                'website' => '',
-                'about' => '',
-                'established_year' => '',
-                'holidays' => [],
-            ]);
-        }
-        return response()->json($profile);
+        $countries = Country::where('region', 'Asia')->orderBy('name')->get();
+        return view('admin.school.profile', compact('profile','countries'));
     }
 
     public function upsert(Request $request)
     {
-        // For file uploads, we use multipart/form-data (handled by FormData in the UI)
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'academic_year' => 'nullable|string|max:255',
@@ -43,18 +28,19 @@ class SchoolProfileController extends Controller
             'about' => 'nullable|string',
             'established_year' => 'nullable|integer|min:1800|max:'.(date('Y') + 1),
             'holidays' => 'nullable|array',
-            'holidays.*.date' => 'required_with:holidays|date',
-            'holidays.*.title' => 'required_with:holidays|string|max:255',
-            'logo' => 'nullable|image|max:2048', // up to ~2MB
-            'banner_image' => 'nullable|image|max:4096', // up to ~4MB
+            'timezone' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'upazila' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|max:2048',
+            'banner_image' => 'nullable|image|max:4096',
         ]);
 
         $profile = SchoolProfile::first();
 
-        // Prepare data to save
         $data = $validated;
 
-        // Handle file uploads
+        // Handle file uploads (optional for this form)
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('public/school');
             $data['logo_path'] = Storage::url($path);
@@ -70,6 +56,6 @@ class SchoolProfileController extends Controller
             $profile = SchoolProfile::create($data);
         }
 
-        return response()->json($profile, 201);
+        return redirect()->route('admin.school.profile')->with('status', 'School profile saved successfully.');
     }
 }
